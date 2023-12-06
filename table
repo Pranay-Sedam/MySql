@@ -1,0 +1,78 @@
+1.	Create a LOGIN table (username, password, and email). Write a procedure (named addUser) to pass the username, password, and email-ID through the procedure and store the data in the LOGIN table.
+drop procedure if exists addUser;
+drop table if exists login;
+delimiter $
+create table login(Username varchar(20),  Password int , EmailID varchar(50));
+create procedure addUser(in _username varchar(20),  in _password int, in _email varchar(50))
+begin
+	insert into login values(_username, _password, _email);
+end $
+delimiter ;
+
+
+1.	Create a LOG table having following columns (id (auto_increment), curr_date, curr_time, and message). Write a procedure (named checkUser) to pass the email-ID as an input, check whether passed email-ID is available in LOGIN table or not available. If the email-ID is available then display the username and his password. If the email-ID is not available then, insert (curr_date, curr_time, and message) in LOG table.
+drop procedure if exists checkUser;
+drop table if exists log0;
+delimiter $
+create table log0(ID int primary key auto_increment, curr_date date, curr_time time, Message varchar(100));
+create procedure checkUser(in _mail varchar(50))
+begin
+	declare check1 bool;
+	select true into check1 from login where emailID = _mail;
+	if check1 then 
+		select UserName, Password from login where emailID = _mail;
+	else 
+		insert into log0 values(id,current_date, current_time, _mail);
+	end if;
+end $
+delimiter ;
+
+
+1.	Write a procedure(named getQualification) that takes studentID as a parameter. If studentID is present in the student table, then print his student details along with STUDENT_QUALIFICATION details and if the studentID is not present display message “Student not found…” (Use: STUDENT, and STUDENT_QUALIFICATION tables)
+drop procedure if exists getQualification;
+delimiter $
+create procedure getQualification(in _studentid int)
+begin
+	declare check1 bool;
+	select true into check1 from student where ID = _studentid;
+	if check1 then 
+		select s.id ID, Namefirst, Namelast, DOB, EmailID, name Degree, College, University, Marks, year from student s join student_qualifications sq where s.id = sq.studentid and sq.studentid = _studentid ;
+	else 
+		select "Student not found !" as "Error Window";
+	end if;
+end $
+delimiter ;
+
+
+
+
+
+1.	Write a procedure (named addStudent) that inserts a new student with his phone number and his address into the STUDENT, PHONE, and ADDRESS table.
+drop procedure if exists addStudent;
+delimiter $
+create procedure addStudent(in _id int, in _namefirst varchar(45), in _namelast varchar(45), in _dob date, in _emailid varchar(128), in _number varchar(45), in _address varchar(128))
+begin
+	insert into student values(_id, _namefirst, _namelast, _dob,  _emailid);
+	insert into student_phone values(id, _id, _number, 1);
+	insert into student_address values(id, _id, _address);
+end $
+delimiter ;
+
+
+
+
+1.	Write a procedure (named addQualification) that takes studentID, and qualification details as a parameter. If studentID is present in the STUDENT table, then insert the qualification in STUDENT_QUALIFICATION table and return a message “Record inserted” or else print ‘Student not found’. (hint: using OUT parameter) (Use: STUDENT, and STUDENT_QUALIFICATION tables)
+drop procedure if exists addQualification;
+delimiter $
+create procedure addQualification(in _studentid int, in _name varchar(45), in _college varchar(45), in _university varchar(50), in _marks int, in _year int)
+begin
+	declare check1 bool;
+	select true into check1 from student where id = _studentid;
+	if check1 then
+		insert into student_qualifications values(id, _studentid, _name,_college, _university, _marks, _year);
+		select "Record inserted" as "Window";
+	else 
+		select "Student not found" as "Error Window";
+	end if;
+end $
+delimiter ;
